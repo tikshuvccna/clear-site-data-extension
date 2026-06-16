@@ -1,12 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Clear Site Data (One Click)",
-  "version": "1.0.0",
-  "description": "One-click total clear of the current site's cache, cookies, and storage — same as DevTools 'Clear site data'. Optionally auto-refreshes the tab.",
+  "version": "1.1.0",
+  "description": "One-click total clear of the current site's cache, cookies, and storage — same as DevTools 'Clear site data'. Right-click for more: clear all sites, history, custom clean, and memory usage.",
   "permissions": [
     "browsingData",
+    "history",
     "tabs",
-    "storage"
+    "storage",
+    "contextMenus",
+    "system.memory"
   ],
   "host_permissions": [
     "<all_urls>"

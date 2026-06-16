@@ -21,6 +21,10 @@ const include = [
   "background.js",
   "options.html",
   "options.js",
+  "clean.html",
+  "clean.js",
+  "memory.html",
+  "memory.js",
   "icons"
 ];
 

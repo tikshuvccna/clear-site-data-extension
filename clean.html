@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Choose what to clean</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 24px auto;
+      max-width: 520px;
+      color: #1f1f1f;
+      padding: 0 16px;
+    }
+    h1 { font-size: 18px; margin: 0 0 4px; }
+    .sub { font-size: 13px; color: #5f6368; margin: 0 0 18px; }
+    fieldset { border: 1px solid #dadce0; border-radius: 8px; margin: 0 0 16px; padding: 12px 14px; }
+    legend { font-size: 12px; font-weight: 600; color: #3c4043; padding: 0 6px; }
+    label { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 4px 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+    select { font-size: 13px; padding: 4px 6px; border-radius: 6px; border: 1px solid #dadce0; }
+    .row { display: flex; align-items: center; gap: 10px; }
+    button {
+      font-size: 14px; font-weight: 600; color: #fff; background: #1976d2;
+      border: none; border-radius: 8px; padding: 10px 18px; cursor: pointer;
+    }
+    button:hover { background: #1565c0; }
+    button.secondary { background: #e8eaed; color: #3c4043; }
+    button.secondary:hover { background: #dadce0; }
+    #status { font-size: 13px; margin-top: 12px; min-height: 18px; }
+    .actions { display: flex; gap: 10px; align-items: center; }
+  </style>
+</head>
+<body>
+  <h1>Choose what to clean</h1>
+  <p class="sub">Pick the data types and time range, then clear.</p>
+
+  <fieldset>
+    <legend>Data types</legend>
+    <div class="grid">
+      <label><input type="checkbox" data-type="cache" checked /> Cache</label>
+      <label><input type="checkbox" data-type="cacheStorage" checked /> Cache storage</label>
+      <label><input type="checkbox" data-type="cookies" /> Cookies</label>
+      <label><input type="checkbox" data-type="localStorage" /> Local storage</label>
+      <label><input type="checkbox" data-type="indexedDB" /> IndexedDB</label>
+      <label><input type="checkbox" data-type="serviceWorkers" /> Service workers</label>
+      <label><input type="checkbox" data-type="fileSystems" /> File systems</label>
+      <label><input type="checkbox" data-type="webSQL" /> WebSQL</label>
+      <label><input type="checkbox" data-type="history" /> Browsing history</label>
+      <label><input type="checkbox" data-type="downloads" /> Download history</label>
+      <label><input type="checkbox" data-type="formData" /> Form data</label>
+      <label><input type="checkbox" data-type="passwords" /> Passwords</label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Scope &amp; time range</legend>
+    <label><input type="checkbox" id="thisSiteOnly" /> Only the current site (origin)</label>
+    <div class="row" style="margin-top:8px;">
+      <span>Time range:</span>
+      <select id="range">
+        <option value="0">All time</option>
+        <option value="3600000">Last hour</option>
+        <option value="86400000">Last 24 hours</option>
+        <option value="604800000">Last 7 days</option>
+        <option value="2419200000">Last 4 weeks</option>
+      </select>
+    </div>
+  </fieldset>
+
+  <div class="actions">
+    <button id="clear">Clear selected</button>
+    <button id="close" class="secondary">Close</button>
+  </div>
+  <div id="status"></div>
+
+  <script src="clean.js"></script>
+</body>
+</html>

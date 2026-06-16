@@ -1,6 +1,14 @@
-// One-click "Clear site data" for the active tab's origin.
-// Behaves like DevTools Application > Storage > "Clear site data": it wipes
-// cache, cookies, and every kind of site storage scoped to the current origin.
+// One-click "Clear site data" for the active tab's origin, plus a right-click
+// context menu exposing more features.
+//
+//   Single click on icon   -> instant total clear of the CURRENT site's data
+//                             (like DevTools Application > Storage > "Clear site data").
+//   Right-click on icon     -> menu:
+//       - Clear THIS site's data (same as single click)
+//       - Clear ALL sites' data (every origin)
+//       - Clear browsing history
+//       - Choose what to clean...  (opens custom page)
+//       - Show memory usage...     (opens memory page)
 
 const ALL_DATA_TYPES = {
   appcache: true,
@@ -45,12 +53,14 @@ async function flashBadge(tabId, text, color) {
   }
 }
 
-chrome.action.onClicked.addListener(async (tab) => {
+// ---- Core actions -------------------------------------------------------
+
+// Clear all data for just the active tab's origin.
+async function clearThisSite(tab) {
   if (!tab || !tab.id) return;
 
   const origin = originForUrl(tab.url);
   if (!origin) {
-    // Can't clear data for chrome://, about:, file://, extension pages, etc.
     await flashBadge(tab.id, "n/a", "#9e9e9e");
     return;
   }
@@ -58,22 +68,147 @@ chrome.action.onClicked.addListener(async (tab) => {
   const { autoRefresh } = await getOptions();
 
   try {
-    await chrome.browsingData.remove(
-      {
-        // Scope the wipe to just this origin — "Active site only".
-        origins: [origin]
-      },
-      ALL_DATA_TYPES
-    );
-
+    await chrome.browsingData.remove({ origins: [origin] }, ALL_DATA_TYPES);
     await flashBadge(tab.id, "OK", "#2e7d32");
-
     if (autoRefresh) {
-      // Bypass cache on reload so the fresh page isn't served from a stale copy.
       chrome.tabs.reload(tab.id, { bypassCache: true }).catch(() => {});
     }
   } catch (err) {
     console.error("Clear site data failed:", err);
     await flashBadge(tab.id, "ERR", "#c62828");
+  }
+}
+
+// Clear data for ALL sites (whole browser), all time.
+async function clearAllSites(tab) {
+  try {
+    // No `origins` and no `since` => everything, for all time. Note: not all
+    // data types are valid when unscoped; this set is the full browser wipe.
+    await chrome.browsingData.remove(
+      { since: 0 },
+      {
+        appcache: true,
+        cache: true,
+        cacheStorage: true,
+        cookies: true,
+        downloads: true,
+        fileSystems: true,
+        indexedDB: true,
+        localStorage: true,
+        serviceWorkers: true,
+        webSQL: true
+      }
+    );
+    if (tab && tab.id) {
+      await flashBadge(tab.id, "ALL", "#2e7d32");
+      const { autoRefresh } = await getOptions();
+      if (autoRefresh && originForUrl(tab.url)) {
+        chrome.tabs.reload(tab.id, { bypassCache: true }).catch(() => {});
+      }
+    }
+  } catch (err) {
+    console.error("Clear all sites failed:", err);
+    if (tab && tab.id) await flashBadge(tab.id, "ERR", "#c62828");
+  }
+}
+
+// Clear browsing + download history (all time).
+async function clearHistory(tab) {
+  try {
+    await chrome.browsingData.remove({ since: 0 }, { history: true, downloads: true });
+    if (tab && tab.id) await flashBadge(tab.id, "HST", "#2e7d32");
+  } catch (err) {
+    console.error("Clear history failed:", err);
+    if (tab && tab.id) await flashBadge(tab.id, "ERR", "#c62828");
+  }
+}
+
+// ---- Context menu -------------------------------------------------------
+
+const MENU = {
+  thisSite: "clear-this-site",
+  allSites: "clear-all-sites",
+  history: "clear-history",
+  custom: "choose-what",
+  memory: "show-memory"
+};
+
+function buildMenu() {
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: MENU.thisSite,
+      title: "Clear THIS site's data",
+      contexts: ["action"]
+    });
+    chrome.contextMenus.create({
+      id: MENU.allSites,
+      title: "Clear ALL sites' data (everything)",
+      contexts: ["action"]
+    });
+    chrome.contextMenus.create({
+      id: MENU.history,
+      title: "Clear browsing history",
+      contexts: ["action"]
+    });
+    chrome.contextMenus.create({
+      id: "sep1",
+      type: "separator",
+      contexts: ["action"]
+    });
+    chrome.contextMenus.create({
+      id: MENU.custom,
+      title: "Choose what to clean…",
+      contexts: ["action"]
+    });
+    chrome.contextMenus.create({
+      id: MENU.memory,
+      title: "Show memory usage…",
+      contexts: ["action"]
+    });
+  });
+}
+
+chrome.runtime.onInstalled.addListener(buildMenu);
+chrome.runtime.onStartup.addListener(buildMenu);
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  switch (info.menuItemId) {
+    case MENU.thisSite:
+      clearThisSite(tab);
+      break;
+    case MENU.allSites:
+      clearAllSites(tab);
+      break;
+    case MENU.history:
+      clearHistory(tab);
+      break;
+    case MENU.custom:
+      chrome.tabs.create({ url: chrome.runtime.getURL("clean.html") });
+      break;
+    case MENU.memory:
+      chrome.tabs.create({ url: chrome.runtime.getURL("memory.html") });
+      break;
+  }
+});
+
+// ---- Single click = instant clear of current site -----------------------
+
+chrome.action.onClicked.addListener((tab) => {
+  clearThisSite(tab);
+});
+
+// ---- Messages from the "Choose what to clean" page ----------------------
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg && msg.type === "customClear") {
+    const removalOptions = {};
+    if (typeof msg.since === "number") removalOptions.since = msg.since;
+    if (msg.thisSiteOnly && msg.origin) removalOptions.origins = [msg.origin];
+
+    chrome.browsingData.remove(removalOptions, msg.dataTypes || {}).then(
+      () => sendResponse({ ok: true }),
+      (err) => sendResponse({ ok: false, error: String(err) })
+    );
+    return true; // keep the message channel open for the async response
   }
 });
