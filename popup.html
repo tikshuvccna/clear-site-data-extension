@@ -64,6 +64,48 @@
       min-height: 16px;
       color: #2e7d32;
     }
+    /* Confirmation panel for the destructive "clear all" action */
+    #confirm {
+      display: none;
+      padding: 12px 14px 14px;
+      background: #fff4f4;
+      border-top: 1px solid #f3c2c2;
+    }
+    #confirm.show { display: block; }
+    #confirm .title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #b00020;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #confirm .msg {
+      font-size: 12px;
+      color: #5f1f1f;
+      margin: 8px 0 4px;
+      line-height: 1.4;
+    }
+    #confirm ul {
+      margin: 4px 0 10px;
+      padding-left: 18px;
+      font-size: 12px;
+      color: #5f1f1f;
+    }
+    #confirm .buttons { display: flex; gap: 8px; }
+    #confirm button {
+      flex: 1;
+      padding: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    #confirm .cancel { background: #e8eaed; color: #3c4043; }
+    #confirm .cancel:hover { background: #dadce0; }
+    #confirm .danger { background: #c62828; color: #fff; }
+    #confirm .danger:hover { background: #b71c1c; }
   </style>
 </head>
 <body>
@@ -86,6 +128,21 @@
   <button class="item" data-action="openMemory">
     <span class="ico">📊</span> Show memory usage…
   </button>
+
+  <div id="confirm">
+    <div class="title">⚠️ Clear ALL sites' data?</div>
+    <div class="msg">This wipes the whole browser, not just this site. You will be:</div>
+    <ul>
+      <li><b>Logged out of every website</b> (all cookies deleted)</li>
+      <li>Cleared of all cache, local storage, IndexedDB &amp; service workers</li>
+      <li>Cleared of your download history</li>
+    </ul>
+    <div class="msg">This cannot be undone.</div>
+    <div class="buttons">
+      <button class="cancel" id="confirmCancel">Cancel</button>
+      <button class="danger" id="confirmGo">Yes, clear everything</button>
+    </div>
+  </div>
 
   <div id="status"></div>
   <script src="popup.js"></script>

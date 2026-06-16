@@ -8,7 +8,8 @@ everything for that origin. Optionally it auto-refreshes the tab afterward.
 
 - **Click the icon → clean popup menu** with a big **Clear THIS site now** button on top, plus:
   - **Clear ALL sites' data (everything)** — full browser wipe (cache, cookies, storage,
-    downloads…) for all sites and all time.
+    downloads…) for all sites and all time. **Requires a confirmation step** in the popup,
+    since it logs you out of every site.
   - **Clear browsing history** — browsing + download history.
   - **Choose what to clean…** — a page with per-type checkboxes, an "only this site" scope
     toggle, and a time range (last hour … all time).
