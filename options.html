@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Clear Site Data — Options</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 16px;
+      min-width: 280px;
+      color: #1f1f1f;
+    }
+    h1 { font-size: 15px; margin: 0 0 12px; }
+    label { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .hint { font-size: 12px; color: #5f6368; margin: 6px 0 0 24px; }
+    #status { font-size: 12px; color: #2e7d32; height: 16px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Clear Site Data — Options</h1>
+  <label>
+    <input type="checkbox" id="autoRefresh" />
+    Automatically refresh the tab after clearing
+  </label>
+  <div class="hint">Reloads the current page (bypassing cache) once the site's data is cleared.</div>
+  <div id="status"></div>
+  <script src="options.js"></script>
+</body>
+</html>
