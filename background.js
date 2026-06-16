@@ -191,16 +191,43 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-// ---- Single click = instant clear of current site -----------------------
+// ---- Keyboard shortcut = instant clear of current site ------------------
 
-chrome.action.onClicked.addListener((tab) => {
-  clearThisSite(tab);
+async function activeTab() {
+  const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  return tabs[0] || null;
+}
+
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command === "clear-this-site") {
+    const tab = await activeTab();
+    if (tab) clearThisSite(tab);
+  }
 });
 
-// ---- Messages from the "Choose what to clean" page ----------------------
+// ---- Messages from the popup and the "Choose what to clean" page ---------
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg && msg.type === "customClear") {
+  if (!msg) return;
+
+  // Named actions triggered from the popup menu.
+  if (msg.type === "action") {
+    (async () => {
+      const tab = await activeTab();
+      switch (msg.action) {
+        case "clearThisSite": await clearThisSite(tab); break;
+        case "clearAllSites": await clearAllSites(tab); break;
+        case "clearHistory":  await clearHistory(tab);  break;
+        case "openClean":     chrome.tabs.create({ url: chrome.runtime.getURL("clean.html") }); break;
+        case "openMemory":    chrome.tabs.create({ url: chrome.runtime.getURL("memory.html") }); break;
+      }
+      sendResponse({ ok: true });
+    })();
+    return true;
+  }
+
+  // Custom clear from clean.html.
+  if (msg.type === "customClear") {
     const removalOptions = {};
     if (typeof msg.since === "number") removalOptions.since = msg.since;
     if (msg.thisSiteOnly && msg.origin) removalOptions.origins = [msg.origin];

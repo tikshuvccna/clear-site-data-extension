@@ -19,6 +19,8 @@ if (fs.existsSync(zipPath)) fs.rmSync(zipPath);
 const include = [
   "manifest.json",
   "background.js",
+  "popup.html",
+  "popup.js",
   "options.html",
   "options.js",
   "clean.html",

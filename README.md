@@ -6,25 +6,28 @@ everything for that origin. Optionally it auto-refreshes the tab afterward.
 
 ## Features
 
-- **One click = clear this site.** A single click on the toolbar icon clears immediately
-  (no popup, no menu in the way). Removes cache, cacheStorage, cookies, IndexedDB,
-  localStorage, service workers, fileSystems, and webSQL — scoped to the current tab's origin.
-- **Right-click for more.** Right-clicking the icon opens a menu with:
-  - **Clear THIS site's data** — same as a single click.
+- **Click the icon → clean popup menu** with a big **Clear THIS site now** button on top, plus:
   - **Clear ALL sites' data (everything)** — full browser wipe (cache, cookies, storage,
     downloads…) for all sites and all time.
   - **Clear browsing history** — browsing + download history.
   - **Choose what to clean…** — a page with per-type checkboxes, an "only this site" scope
     toggle, and a time range (last hour … all time).
   - **Show memory usage…** — current system RAM total / available / in-use.
+- **Instant keyboard shortcut.** Press **`Alt+Shift+C`** to clear the current site immediately —
+  no clicks, no popup. (Rebind it at `chrome://extensions/shortcuts`.)
+- **Total clear for the active site.** Removes cache, cacheStorage, cookies, IndexedDB,
+  localStorage, service workers, fileSystems, and webSQL — scoped to the current tab's origin,
+  matching DevTools "Clear site data".
 - **Optional auto-refresh.** After clearing the active site, reload the tab (cache-bypassed).
   Toggle it in Options.
 - **Visual feedback.** A short badge on the icon: `OK` / `ALL` / `HST` (success),
   `ERR` (failed), `n/a` (page can't be cleared, e.g. `chrome://` pages).
 
-> **Why right-click instead of double-click?** Chrome's extension API has no double-click event
-> for the toolbar icon, so a single click stays instantly responsive while the extra features live
-> in the native right-click menu.
+> **Why a popup + shortcut instead of single-click / double-click?** Chrome's extension API
+> has no double-click event for the toolbar icon, and clicking an icon that has a popup can't
+> also run an instant action. So the menu lives in a clean popup (fully app-controlled, unlike
+> the right-click menu which Chrome pads with its own items), and the instant one-click clear is
+> the `Alt+Shift+C` keyboard shortcut.
 
 ## Install (load unpacked)
 

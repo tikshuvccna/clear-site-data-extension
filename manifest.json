@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Clear Site Data (One Click)",
-  "version": "1.1.0",
-  "description": "One-click total clear of the current site's cache, cookies, and storage — same as DevTools 'Clear site data'. Right-click for more: clear all sites, history, custom clean, and memory usage.",
+  "version": "1.2.0",
+  "description": "Clear the current site's cache, cookies, and storage — same as DevTools 'Clear site data'. Popup menu with more: clear all sites, history, custom clean, and memory usage. Keyboard shortcut for instant clear.",
   "permissions": [
     "browsingData",
     "history",
@@ -15,12 +15,21 @@
     "<all_urls>"
   ],
   "action": {
-    "default_title": "Clear site data for this site",
+    "default_title": "Clear Site Data — click for menu (Alt+Shift+C = instant clear)",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
+    }
+  },
+  "commands": {
+    "clear-this-site": {
+      "suggested_key": {
+        "default": "Alt+Shift+C"
+      },
+      "description": "Instantly clear the current site's data"
     }
   },
   "options_ui": {
